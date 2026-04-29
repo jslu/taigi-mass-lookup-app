@@ -1,0 +1,287 @@
+/* ==========================================================================
+   Source of truth: src/styles/designToken/* and src/styles/variables.ts
+   ========================================================================== */
+
+/* Inter — brand font, loaded from local variable TTFs (opsz + wght axes). */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/Inter-VariableFont_opsz_wght.ttf') format('truetype-variations'),
+       url('fonts/Inter-VariableFont_opsz_wght.ttf') format('truetype');
+  font-variation-settings: "opsz" 14;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/Inter-Italic-VariableFont_opsz_wght.ttf') format('truetype-variations'),
+       url('fonts/Inter-Italic-VariableFont_opsz_wght.ttf') format('truetype');
+  font-variation-settings: "opsz" 14;
+}
+
+:root {
+  /* ==== PALETTE — Blue scale (brand) ==== */
+  --uBlue-01: hsl(214, 100%, 95%);   /* rgb(229,241,255) */
+  --uBlue-02: hsl(214, 100%, 90%);   /* rgb(204,226,255) */
+  --uBlue-03: hsl(214, 100%, 80%);   /* rgb(153,197,255) */
+  --uBlue-04: hsl(214, 100%, 70%);   /* rgb(102,169,255) */
+  --uBlue-05: hsl(214, 100%, 60%);   /* rgb(51,140,255) */
+  --uBlue-06: #006EFF;               /* primary brand */
+  --uBlue-07: hsl(214, 100%, 40%);   /* rgb(0,73,204) */
+  --uBlue-08: hsl(214, 100%, 33%);   /* rgb(0,72,166) */
+  --uBlue-09: hsl(214, 100%, 25%);   /* rgb(0,56,128) */
+  --uBlue-10: hsl(214, 100%, 17%);   /* rgb(0,39,89) */
+
+  /* ==== Neutrals (light) ==== */
+  --neutral-00: rgb(255,255,255);
+  --neutral-01: rgb(250,251,251);
+  --neutral-02: rgb(246,246,248);
+  --neutral-03: rgb(237,237,240);
+  --neutral-04: rgb(219,220,225);
+  --neutral-05: rgb(200,202,211);
+  --neutral-06: rgb(182,185,196);
+  --neutral-07: rgb(164,167,181);
+  --neutral-08: rgb(131,134,145);
+  --neutral-09: rgb(107,109,118);
+  --neutral-10: rgb(82,83,90);
+  --neutral-11: rgb(57,58,63);
+  --neutral-12: rgb(33,33,36);
+
+  /* ==== Semantic accents ==== */
+  --green-01: rgb(235,250,239);
+  --green-03: rgb(176,235,193);
+  --green-06: rgb(57,204,100);   /* success */
+  --green-07: rgb(46,163,80);
+
+  --red-01: rgb(253,235,236);
+  --red-03: rgb(249,176,178);
+  --red-06: rgb(240,58,62);      /* danger / error */
+  --red-07: rgb(192,46,50);
+
+  --orange-01: rgb(254,246,233);
+  --orange-03: rgb(251,219,167);
+  --orange-06: rgb(245,166,35);  /* warning */
+  --orange-07: rgb(192,133,28);
+
+  --yellow-06: #FFDD1A;
+  --purple-06: rgb(162,82,227);
+  --aqua-06:   #44C6FD;
+  --lime-06:   #AFD322;
+  --navy-06:   #003D9E;
+  --green-06-datavis: #38CC65;
+  --orange-06-datavis: #F5A524;
+
+  /* ==== Semantic tokens — text (alpha on white) ==== */
+  --text-00: rgba(0,0,0,1);      /* Headers */
+  --text-01: rgba(0,0,0,0.85);   /* Primary */
+  --text-02: rgba(0,0,0,0.65);   /* Secondary */
+  --text-03: rgba(0,0,0,0.45);   /* Tertiary / helper */
+  --text-04: rgba(0,0,0,0.20);   /* Disabled / placeholder */
+
+  --text-inverse-00: rgba(255,255,255,1);
+  --text-inverse-01: rgba(255,255,255,0.85);
+  --text-inverse-02: rgba(255,255,255,0.65);
+  --text-inverse-03: rgba(255,255,255,0.45);
+
+  /* ==== Semantic tokens — surfaces ==== */
+  --bg-base:      var(--neutral-00);   /* cards, popovers */
+  --bg-shell:     rgb(241,242,244);    /* app background */
+  --bg-subtle:    var(--neutral-02);
+  --bg-muted:     var(--neutral-03);
+  --bg-hover:     var(--neutral-02);
+  --bg-selected:  rgb(242,248,255);
+
+  --border-subtle:  rgb(238,239,241);  /* divider */
+  --border-default: var(--neutral-04);
+  --border-strong:  var(--neutral-10);
+
+  /* ==== Semantic roles ==== */
+  --color-primary:      var(--uBlue-06);
+  --color-primary-hover: hsl(214, 100%, 46%);
+  --color-primary-active: var(--uBlue-07);
+  --color-success:      var(--green-06);
+  --color-warning:      var(--orange-06);
+  --color-danger:       var(--red-06);
+  --color-info:         var(--uBlue-06);
+  --color-link:         var(--uBlue-06);
+  --color-link-hover:   rgb(7,89,201);
+
+  --focus-ring:         var(--uBlue-06);
+
+  /* ==== Radii (base 4px) ==== */
+  --radius-none:     0px;
+  --radius-small:    4px;
+  --radius-medium:   8px;
+  --radius-large:   16px;
+  --radius-round:   50%;
+  --radius-pill: 99999px;
+
+  --radius-btn:      4px;   /* small/medium */
+  --radius-btn-lg:   8px;
+  --radius-modal:    8px;
+  --radius-toast:    8px;
+  --radius-chip:     4px;
+
+  /* ==== Spacing (4px base) ==== */
+  --space-none:     0;
+  --space-xxs:      2px;
+  --space-xs:       4px;
+  --space-s:        8px;
+  --space-cm:      12px;
+  --space-m:       16px;
+  --space-cl:      20px;
+  --space-l1:      24px;
+  --space-l2:      32px;
+  --space-xl1:     40px;
+  --space-xl2:     48px;
+  --space-xl3:     56px;
+  --space-xxl1:    64px;
+  --space-xxl2:    72px;
+  --space-xxl3:    80px;
+
+  /* ==== Shadows (light motif) ==== */
+  --shadow-initial:  0 0 1px 0 rgba(33,33,36,0.04);
+  --shadow-superlow: 0 4px 12px 0 rgba(33,33,36,0.04), 0 0 1px 0 rgba(33,33,36,0.04);
+  --shadow-low:      0 8px 24px 0 rgba(33,33,36,0.04), 0 0 1px 0 rgba(33,33,36,0.04);
+  --shadow-high:    0 12px 48px 0 rgba(33,33,36,0.06), 0 0 1px 0 rgba(33,33,36,0.04);
+
+  /* Primary-tinted shadow used on focused buttons */
+  --shadow-primary-focus: 0 0 0 3px rgba(0,111,255,0.12);
+
+  /* ==== Focus outline ==== */
+  --outline-focus: 1px solid var(--uBlue-06);
+  --outline-offset: 1px;
+
+  /* ==== Motion ==== */
+  --timing-instant: 80ms;
+  --timing-fast: 150ms;
+  --timing-base: 200ms;
+  --timing-slow: 300ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ==== Z index ==== */
+  --z-app-header:  600;
+  --z-side-panel:  700;
+  --z-global:      800;
+  --z-modal:       900;
+  --z-modal-bd:   1000;
+  --z-toast:      1100;
+  --z-popover:    1200;
+  --z-tooltip:    1300;
+
+  /* ==== App chrome sizing ==== */
+  --app-header-h: 56px;
+  --nav-w: 56px;
+
+  /* ==== TYPE — primary stack ==== */
+  --font-sans: 'Inter', 'Inter Variable', -apple-system, BlinkMacSystemFont,
+               'Segoe UI', 'Lato', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+
+  /* Weights — only two used system-wide */
+  --fw-regular:  400;
+  --fw-semibold: 600;
+
+  /* Sizes — Inter scale (1px off-base so caps line up to 4px grid) */
+  --fs-xs:   9px;
+  --fs-s:   11px;
+  --fs-m:   13px;   /* body default */
+  --fs-l:   15px;   /* h-large */
+  --fs-xl1: 19px;
+  --fs-xl2: 23px;
+  --fs-xl3: 27px;
+  --fs-xl4: 35px;
+
+  /* Line-heights (derived from 4px sizing scale) */
+  --lh-04: 16px;
+  --lh-05: 20px;
+  --lh-06: 24px;
+  --lh-07: 28px;
+  --lh-08: 32px;
+  --lh-09: 36px;
+  --lh-12: 48px;
+
+  --letter-spacing-tight: -0.01em;
+  --letter-spacing-btn:   0.25px;
+}
+
+/* ==========================================================================
+   Semantic element defaults (type scale)
+   ========================================================================== */
+html, body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-m);
+  line-height: var(--lh-05);
+  color: var(--text-01);
+  background: var(--bg-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv11", "ss01";
+}
+
+h1, .u-h1 {
+  font: var(--fw-semibold) var(--fs-xl4)/var(--lh-12) var(--font-sans);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--text-00);
+  margin: 0;
+}
+h2, .u-h2 {
+  font: var(--fw-semibold) var(--fs-xl3)/var(--lh-09) var(--font-sans);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--text-00);
+  margin: 0;
+}
+h3, .u-h3 {
+  font: var(--fw-semibold) var(--fs-xl2)/var(--lh-08) var(--font-sans);
+  color: var(--text-00);
+  margin: 0;
+}
+h4, .u-h4 {
+  font: var(--fw-semibold) var(--fs-xl1)/var(--lh-07) var(--font-sans);
+  color: var(--text-00);
+  margin: 0;
+}
+h5, .u-h5 {
+  font: var(--fw-semibold) var(--fs-l)/var(--lh-06) var(--font-sans);
+  color: var(--text-00);
+  margin: 0;
+}
+h6, .u-h6 {
+  font: var(--fw-semibold) var(--fs-m)/var(--lh-05) var(--font-sans);
+  color: var(--text-00);
+  margin: 0;
+}
+
+p, .u-body {
+  font: var(--fw-regular) var(--fs-m)/var(--lh-05) var(--font-sans);
+  color: var(--text-01);
+  margin: 0;
+}
+.u-body-2 {
+  font: var(--fw-regular) var(--fs-m)/var(--lh-05) var(--font-sans);
+  color: var(--text-02);
+}
+.u-caption {
+  font: var(--fw-regular) var(--fs-s)/var(--lh-04) var(--font-sans);
+  color: var(--text-03);
+}
+.u-label {
+  font: var(--fw-regular) var(--fs-s)/var(--lh-04) var(--font-sans);
+  color: var(--text-03);
+}
+.u-link {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color var(--timing-fast) var(--ease-standard);
+}
+.u-link:hover { color: var(--color-link-hover); }
+
+code, kbd, pre, samp, .u-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-01);
+}
