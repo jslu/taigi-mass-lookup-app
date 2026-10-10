@@ -1,0 +1,30 @@
+{
+  "name": "taigi-mass-lookup-app",
+  "version": "1.0.0",
+  "description": "Paste a 台語文 passage, get sentence-by-sentence 漢字 ↔ Tâi-lô conversion with four display layouts (Ruby / Stacked / Side-by-side / Table) and a tone-mode toggle (diacritic ↔ numeric).",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "elm-test",
+    "build": "elm make src/Main.elm --output=main.js --optimize"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jslu/taigi-mass-lookup-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jslu/taigi-mass-lookup-app/issues"
+  },
+  "homepage": "https://github.com/jslu/taigi-mass-lookup-app#readme",
+  "devDependencies": {
+    "elm-live": "^4.0.2",
+    "elm-test": "^0.19.3-0",
+    "puppeteer": "^25.13.0"
+  }
+}
