@@ -519,11 +519,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.aF.ah === region.aS.ah)
+	if (region.aH.ai === region.aU.ai)
 	{
-		return 'on line ' + region.aF.ah;
+		return 'on line ' + region.aH.ai;
 	}
-	return 'on lines ' + region.aF.ah + ' through ' + region.aS.ah;
+	return 'on lines ' + region.aH.ai + ' through ' + region.aU.ai;
 }
 
 
@@ -1861,9 +1861,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bG,
-		impl.b5,
-		impl.cz,
+		impl.bI,
+		impl.b7,
+		impl.cB,
 		function() { return function() {} }
 	);
 });
@@ -2727,9 +2727,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		b9: func(record.b9),
-		aN: record.aN,
-		aM: record.aM
+		cb: func(record.cb),
+		aP: record.aP,
+		aO: record.aO
 	}
 });
 
@@ -2997,11 +2997,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.b9;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aN;
+		var message = !tag ? value : tag < 3 ? value.a : value.cb;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aP;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.aM) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.aO) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3946,8 +3946,8 @@ var _Regex_never = /.^/;
 var _Regex_fromStringWith = F2(function(options, string)
 {
 	var flags = 'g';
-	if (options.bp) { flags += 'm'; }
-	if (options.by) { flags += 'i'; }
+	if (options.br) { flags += 'm'; }
+	if (options.bA) { flags += 'i'; }
 
 	try
 	{
@@ -4048,25 +4048,25 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request.bY.a(response)));
+			callback(toTask(request.b_.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request.bY.b, xhr)); });
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.b_.b, xhr)); });
 		$elm$core$Maybe$isJust(request.z) && _Http_track(router, xhr, request.z.a);
 
 		try {
-			xhr.open(request.s, request.bD, true);
+			xhr.open(request.s, request.bF, true);
 		} catch (e) {
-			return done($elm$http$Http$BadUrl_(request.bD));
+			return done($elm$http$Http$BadUrl_(request.bF));
 		}
 
 		_Http_configureRequest(xhr, request);
 
-		request.bE.a && xhr.setRequestHeader('Content-Type', request.bE.a);
-		xhr.send(request.bE.b);
+		request.bG.a && xhr.setRequestHeader('Content-Type', request.bG.a);
+		xhr.send(request.bG.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4082,8 +4082,8 @@ function _Http_configureRequest(xhr, request)
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
 	xhr.timeout = request.t.a || 0;
-	xhr.responseType = request.bY.d;
-	xhr.withCredentials = request.ag;
+	xhr.responseType = request.b_.d;
+	xhr.withCredentials = request.ah;
 }
 
 
@@ -4104,9 +4104,9 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		bD: xhr.responseURL,
-		br: xhr.status,
-		cm: xhr.statusText,
+		bF: xhr.responseURL,
+		bt: xhr.status,
+		co: xhr.statusText,
 		p: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
@@ -4202,15 +4202,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			bN: event.loaded,
-			aC: event.total
+			bP: event.loaded,
+			aE: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			ch: event.loaded,
-			aC: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			cj: event.loaded,
+			aE: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }
@@ -4244,11 +4244,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bG,
-		impl.b5,
-		impl.cz,
+		impl.bI,
+		impl.b7,
+		impl.cB,
 		function(sendToApp, initialModel) {
-			var view = impl.bO;
+			var view = impl.bQ;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -4280,12 +4280,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bG,
-		impl.b5,
-		impl.cz,
+		impl.bI,
+		impl.b7,
+		impl.cB,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.aE && impl.aE(sendToApp)
-			var view = impl.bO;
+			var divertHrefToApp = impl.aG && impl.aG(sendToApp)
+			var view = impl.bQ;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4293,12 +4293,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.bE);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.bG);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.bS) && (_VirtualDom_doc.title = title = doc.bS);
+				(title !== doc.bU) && (_VirtualDom_doc.title = title = doc.bU);
 			});
 		}
 	);
@@ -4354,12 +4354,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.cp;
-	var onUrlRequest = impl.cu;
+	var onUrlChange = impl.cr;
+	var onUrlRequest = impl.cw;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		aE: function(sendToApp)
+		aG: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4375,9 +4375,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.bi === next.bi
-							&& curr.aT === next.aT
-							&& curr.a4.a === next.a4.a
+							&& curr.bk === next.bk
+							&& curr.aV === next.aV
+							&& curr.a6.a === next.a6.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4385,13 +4385,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		bG: function(flags)
+		bI: function(flags)
 		{
-			return A3(impl.bG, flags, _Browser_getUrl(), key);
+			return A3(impl.bI, flags, _Browser_getUrl(), key);
 		},
-		bO: impl.bO,
-		b5: impl.b5,
-		cz: impl.cz
+		bQ: impl.bQ,
+		b7: impl.b7,
+		cB: impl.cB
 	});
 }
 
@@ -4457,17 +4457,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { bZ: 'hidden', bW: 'visibilitychange' }
+		? { b$: 'hidden', bY: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { bZ: 'mozHidden', bW: 'mozvisibilitychange' }
+		? { b$: 'mozHidden', bY: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { bZ: 'msHidden', bW: 'msvisibilitychange' }
+		? { b$: 'msHidden', bY: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { bZ: 'webkitHidden', bW: 'webkitvisibilitychange' }
-		: { bZ: 'hidden', bW: 'visibilitychange' };
+		? { b$: 'webkitHidden', bY: 'webkitvisibilitychange' }
+		: { b$: 'hidden', bY: 'visibilitychange' };
 }
 
 
@@ -4548,12 +4548,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		a6: _Browser_getScene(),
-		bm: {
-			aP: _Browser_window.pageXOffset,
-			aQ: _Browser_window.pageYOffset,
-			a7: _Browser_doc.documentElement.clientWidth,
-			a8: _Browser_doc.documentElement.clientHeight
+		a8: _Browser_getScene(),
+		bo: {
+			aR: _Browser_window.pageXOffset,
+			aS: _Browser_window.pageYOffset,
+			a9: _Browser_doc.documentElement.clientWidth,
+			ba: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4563,8 +4563,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		a7: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		a8: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		a9: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ba: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4587,15 +4587,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			a6: {
-				a7: node.scrollWidth,
-				a8: node.scrollHeight
+			a8: {
+				a9: node.scrollWidth,
+				ba: node.scrollHeight
 			},
-			bm: {
-				aP: node.scrollLeft,
-				aQ: node.scrollTop,
-				a7: node.clientWidth,
-				a8: node.clientHeight
+			bo: {
+				aR: node.scrollLeft,
+				aS: node.scrollTop,
+				a9: node.clientWidth,
+				ba: node.clientHeight
 			}
 		};
 	});
@@ -4625,18 +4625,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			a6: _Browser_getScene(),
-			bm: {
-				aP: x,
-				aQ: y,
-				a7: _Browser_doc.documentElement.clientWidth,
-				a8: _Browser_doc.documentElement.clientHeight
+			a8: _Browser_getScene(),
+			bo: {
+				aR: x,
+				aS: y,
+				a9: _Browser_doc.documentElement.clientWidth,
+				ba: _Browser_doc.documentElement.clientHeight
 			},
-			b8: {
-				aP: x + rect.left,
-				aQ: y + rect.top,
-				a7: rect.width,
-				a8: rect.height
+			ca: {
+				aR: x + rect.left,
+				aS: y + rect.top,
+				a9: rect.width,
+				ba: rect.height
 			}
 		};
 	});
@@ -5229,7 +5229,7 @@ var $author$project$Main$init = function (storedTweaks) {
 	var layout = _v0.a;
 	var toneMode = _v0.b;
 	return _Utils_Tuple2(
-		{c: '', aa: layout, ac: $elm$core$Maybe$Nothing, u: toneMode, U: -1, ap: false, D: _List_Nil, V: '', X: $elm$core$Maybe$Nothing, x: $elm$core$Dict$empty},
+		{c: '', aa: layout, ac: $elm$core$Maybe$Nothing, u: toneMode, U: -1, aq: false, D: _List_Nil, V: '', af: _List_Nil, X: $elm$core$Maybe$Nothing, x: $elm$core$Dict$empty, au: _List_Nil},
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$json$Json$Decode$map = _Json_map1;
@@ -5751,7 +5751,7 @@ var $author$project$Main$ActivateRow = function (a) {
 };
 var $elm$regex$Regex$Match = F4(
 	function (match, index, number, submatches) {
-		return {a2: index, _: match, b0: number, cn: submatches};
+		return {a4: index, _: match, b2: number, cp: submatches};
 	});
 var $elm$regex$Regex$contains = _Regex_contains;
 var $elm$regex$Regex$never = _Regex_never;
@@ -5759,7 +5759,7 @@ var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
 var $elm$regex$Regex$fromString = function (string) {
 	return A2(
 		$elm$regex$Regex$fromStringWith,
-		{bp: false, by: false},
+		{br: false, bA: false},
 		string);
 };
 var $elm$core$Maybe$withDefault = F2(
@@ -5787,7 +5787,7 @@ var $author$project$Main$isSelected = F2(
 		var _v0 = model.ac;
 		if (!_v0.$) {
 			var sel = _v0.a;
-			return _Utils_eq(sel.au, key);
+			return _Utils_eq(sel.aw, key);
 		} else {
 			return false;
 		}
@@ -5836,9 +5836,9 @@ var $author$project$Tailo$splitKeepSeparators = function (word) {
 				function (match, _v0) {
 					var lastEnd = _v0.a;
 					var acc = _v0.b;
-					var before = A3($elm$core$String$slice, lastEnd, match.a2, word);
+					var before = A3($elm$core$String$slice, lastEnd, match.a4, word);
 					return _Utils_Tuple2(
-						match.a2 + $elm$core$String$length(match._),
+						match.a4 + $elm$core$String$length(match._),
 						A2(
 							$elm$core$List$cons,
 							match._,
@@ -6312,7 +6312,7 @@ var $author$project$Tailo$numericSyllableToDiacritic = function (syl) {
 	var _v0 = A2($elm$regex$Regex$find, $author$project$Tailo$numericSyllableRegex, syl);
 	if (_v0.b && (!_v0.b.b)) {
 		var match = _v0.a;
-		var _v1 = match.cn;
+		var _v1 = match.cp;
 		if ((((_v1.b && (!_v1.a.$)) && _v1.b.b) && (!_v1.b.a.$)) && (!_v1.b.b.b)) {
 			var base = _v1.a.a;
 			var _v2 = _v1.b;
@@ -6894,7 +6894,7 @@ var $author$project$Main$viewPopover = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(sel.al.A)
+							$elm$html$Html$text(sel.am.A)
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -6905,7 +6905,7 @@ var $author$project$Main$viewPopover = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							(sel.al.Q !== '') ? A2($author$project$Tailo$toToneMode, sel.al.Q, toneMode) : '—')
+							(sel.am.Q !== '') ? A2($author$project$Tailo$toToneMode, sel.am.Q, toneMode) : '—')
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -6946,7 +6946,7 @@ var $author$project$Main$viewPopoverFor = F3(
 			return A2(
 				$elm$core$String$startsWith,
 				$elm$core$String$fromInt(idx) + '-',
-				sel.au) ? A2($author$project$Main$viewPopover, model.u, sel) : $elm$html$Html$text('');
+				sel.aw) ? A2($author$project$Main$viewPopover, model.u, sel) : $elm$html$Html$text('');
 		}
 	});
 var $author$project$Main$activeClassSuffix = function (isActive) {
@@ -7072,7 +7072,7 @@ var $author$project$Main$viewSentenceRows = function (model) {
 			var isParaBreak = function () {
 				if (!prev.$) {
 					var p = prev.a;
-					return !_Utils_eq(p.ay, s.ay);
+					return !_Utils_eq(p.aA, s.aA);
 				} else {
 					return false;
 				}
@@ -7278,7 +7278,7 @@ var $author$project$Main$viewResults = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								model.ap ? 'Copied!' : 'Copy all')
+								model.aq ? 'Copied!' : 'Copy all')
 							]))
 					])),
 				$author$project$Main$viewResultsControls(model),
@@ -7354,32 +7354,101 @@ var $author$project$Main$Failed = function (a) {
 var $author$project$Main$Loaded = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Main$sample = '街仔底總仔共仔兩間福州人開ê剃頭店，頭到hit間號做「明星」，是我一个查某同學ê老爸開--ê，另外一間khah遠--ê叫做「萬國」。Kám是囡仔人lóng小面神mā有淡薄仔pì-sù ê款，頭改阿母hiàm我出去外口剪頭鬃，明其知khah遠mā是行去「萬國」hia交關。差不多beh收尾ê時，剃頭師傅問我頂頭beh拍khah薄--無？Tùn-tenn兩、三秒我tsiah應好；論真我家己mā m̄知影啥mi̍h號做拍薄。';
-var $author$project$Main$Loading = {$: 0};
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (!_v0.$) {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
 		return A3(
 			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
 			_List_Nil,
-			xs);
+			list);
 	});
+var $author$project$Main$sample = '街仔底總仔共仔兩間福州人開ê剃頭店，頭到hit間號做「明星」，是我一个查某同學ê老爸開--ê，另外一間khah遠--ê叫做「萬國」。Kám是囡仔人lóng小面神mā有淡薄仔pì-sù ê款，頭改阿母hiàm我出去外口剪頭鬃，明其知khah遠mā是行去「萬國」hia交關。差不多beh收尾ê時，剃頭師傅問我頂頭beh拍khah薄--無？Tùn-tenn兩、三秒我tsiah應好；論真我家己mā m̄知影啥mi̍h號做拍薄。';
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$regex$Regex$split = _Regex_splitAtMost(_Regex_infinity);
+var $author$project$Convert$sentPunct = $elm$core$String$toList('。！？，；：!?,;:');
+var $author$project$Convert$stepChar = F3(
+	function (pIdx, ch, _v0) {
+		var acc = _v0.a;
+		var buf = _v0.b;
+		if (ch === '\n') {
+			return _Utils_Tuple2(acc, buf + ' ');
+		} else {
+			var buf2 = _Utils_ap(
+				buf,
+				$elm$core$String$fromChar(ch));
+			if (A2($elm$core$List$member, ch, $author$project$Convert$sentPunct)) {
+				var t = $elm$core$String$trim(buf2);
+				return (t === '') ? _Utils_Tuple2(acc, '') : _Utils_Tuple2(
+					A2(
+						$elm$core$List$cons,
+						{c: t, aA: pIdx},
+						acc),
+					'');
+			} else {
+				return _Utils_Tuple2(acc, buf2);
+			}
+		}
+	});
+var $author$project$Convert$splitBlock = F2(
+	function (pIdx, block) {
+		var _v0 = A3(
+			$elm$core$String$foldl,
+			$author$project$Convert$stepChar(pIdx),
+			_Utils_Tuple2(_List_Nil, ''),
+			block);
+		var sentencesRev = _v0.a;
+		var buf = _v0.b;
+		var tail = $elm$core$String$trim(buf);
+		var withTail = (tail === '') ? sentencesRev : A2(
+			$elm$core$List$cons,
+			{c: tail, aA: pIdx},
+			sentencesRev);
+		return $elm$core$List$reverse(withTail);
+	});
+var $author$project$Convert$blankLineRegex = A2(
+	$elm$core$Maybe$withDefault,
+	$elm$regex$Regex$never,
+	$elm$regex$Regex$fromString('\u005Cn\u005Cs*\u005Cn'));
+var $author$project$Convert$blankLineSplitRegex = A2(
+	$elm$core$Maybe$withDefault,
+	$elm$regex$Regex$never,
+	$elm$regex$Regex$fromString('\u005Cn\u005Cs*\u005Cn+'));
+var $author$project$Convert$singleNewlineSplitRegex = A2(
+	$elm$core$Maybe$withDefault,
+	$elm$regex$Regex$never,
+	$elm$regex$Regex$fromString('\u005Cn+'));
+var $author$project$Convert$splitSentences = function (text) {
+	if (text === '') {
+		return _List_Nil;
+	} else {
+		var hasBlankLines = A2($elm$regex$Regex$contains, $author$project$Convert$blankLineRegex, text);
+		var paraBlocks = hasBlankLines ? A2($elm$regex$Regex$split, $author$project$Convert$blankLineSplitRegex, text) : A2($elm$regex$Regex$split, $author$project$Convert$singleNewlineSplitRegex, text);
+		return $elm$core$List$concat(
+			A2($elm$core$List$indexedMap, $author$project$Convert$splitBlock, paraBlocks));
+	}
+};
+var $author$project$Main$Loading = {$: 0};
 var $elm$http$Http$Request = function (a) {
 	return {$: 1, a: a};
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {aW: reqs, aY: subs};
+		return {aY: reqs, a_: subs};
 	});
 var $elm$core$Task$succeed = _Scheduler_succeed;
 var $elm$http$Http$init = $elm$core$Task$succeed(
@@ -7856,7 +7925,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.aW));
+			A3($elm$http$Http$updateReqs, router, cmds, state.aY));
 	});
 var $elm$core$Task$map2 = F3(
 	function (func, taskA, taskB) {
@@ -7880,6 +7949,24 @@ var $elm$core$Task$sequence = function (tasks) {
 		$elm$core$Task$succeed(_List_Nil),
 		tasks);
 };
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (!_v0.$) {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
 var $elm$http$Http$maybeSend = F4(
 	function (router, desiredTracker, progress, _v0) {
 		var actualTracker = _v0.a;
@@ -7903,7 +7990,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.aY)));
+					state.a_)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -7917,14 +8004,14 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					bD: r.bD,
-					bE: r.bE,
-					bY: A2(_Http_mapExpect, func, r.bY),
+					bF: r.bF,
+					bG: r.bG,
+					b_: A2(_Http_mapExpect, func, r.b_),
 					s: r.s,
 					p: r.p,
 					t: r.t,
 					z: r.z,
-					ag: r.ag
+					ah: r.ah
 				});
 		}
 	});
@@ -7952,11 +8039,11 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{bD: r.bD, bE: r.bE, bY: r.bY, s: r.s, p: r.p, t: r.t, z: r.z, ag: false}));
+			{bF: r.bF, bG: r.bG, b_: r.b_, s: r.s, p: r.p, t: r.t, z: r.z, ah: false}));
 };
 var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
-		{bD: r.bD, bE: r.bE, bY: r.bY, s: 'POST', p: _List_Nil, t: $elm$core$Maybe$Nothing, z: $elm$core$Maybe$Nothing});
+		{bF: r.bF, bG: r.bG, b_: r.b_, s: 'POST', p: _List_Nil, t: $elm$core$Maybe$Nothing, z: $elm$core$Maybe$Nothing});
 };
 var $author$project$Main$GotTokens = F2(
 	function (a, b) {
@@ -7998,7 +8085,7 @@ var $elm$http$Http$resolve = F2(
 			case 3:
 				var metadata = response.a;
 				return $elm$core$Result$Err(
-					$elm$http$Http$BadStatus(metadata.br));
+					$elm$http$Http$BadStatus(metadata.bt));
 			default:
 				var body = response.b;
 				return A2(
@@ -8035,17 +8122,6 @@ var $elm$http$Http$expectJson = F2(
 var $elm$http$Http$stringBody = _Http_pair;
 var $elm$url$Url$percentEncode = _Url_percentEncode;
 var $author$project$Main$percentEncode = $elm$url$Url$percentEncode;
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $elm$core$String$replace = F3(
 	function (before, after, string) {
 		return A2(
@@ -8061,13 +8137,13 @@ var $author$project$Convert$parsePiece = function (piece) {
 		var tailoRest = _v1.a;
 		return {
 			A: A3($elm$core$String$replace, '-', '', rawHan),
-			aD: '',
+			aF: '',
 			Q: tailoRest
 		};
 	} else {
 		return {
 			A: A3($elm$core$String$replace, '-', '', piece),
-			aD: '',
+			aF: '',
 			Q: ''
 		};
 	}
@@ -8090,103 +8166,114 @@ var $author$project$Main$tokensDecoder = A2(
 var $author$project$Main$fetchTokens = function (sentence) {
 	return $elm$http$Http$post(
 		{
-			bD: '/api/tau',
-			bE: A2(
+			bF: '/api/tau',
+			bG: A2(
 				$elm$http$Http$stringBody,
 				'application/x-www-form-urlencoded',
 				'taibun=' + $author$project$Main$percentEncode(sentence)),
-			bY: A2(
+			b_: A2(
 				$elm$http$Http$expectJson,
 				$author$project$Main$GotTokens(sentence),
 				$author$project$Main$tokensDecoder)
 		});
 };
-var $elm$regex$Regex$split = _Regex_splitAtMost(_Regex_infinity);
-var $author$project$Convert$sentPunct = $elm$core$String$toList('。！？，；：!?,;:');
-var $author$project$Convert$stepChar = F3(
-	function (pIdx, ch, _v0) {
-		var acc = _v0.a;
-		var buf = _v0.b;
-		if (ch === '\n') {
-			return _Utils_Tuple2(acc, buf + ' ');
-		} else {
-			var buf2 = _Utils_ap(
-				buf,
-				$elm$core$String$fromChar(ch));
-			if (A2($elm$core$List$member, ch, $author$project$Convert$sentPunct)) {
-				var t = $elm$core$String$trim(buf2);
-				return (t === '') ? _Utils_Tuple2(acc, '') : _Utils_Tuple2(
-					A2(
-						$elm$core$List$cons,
-						{c: t, ay: pIdx},
-						acc),
-					'');
-			} else {
-				return _Utils_Tuple2(acc, buf2);
-			}
-		}
-	});
-var $author$project$Convert$splitBlock = F2(
-	function (pIdx, block) {
-		var _v0 = A3(
-			$elm$core$String$foldl,
-			$author$project$Convert$stepChar(pIdx),
-			_Utils_Tuple2(_List_Nil, ''),
-			block);
-		var sentencesRev = _v0.a;
-		var buf = _v0.b;
-		var tail = $elm$core$String$trim(buf);
-		var withTail = (tail === '') ? sentencesRev : A2(
-			$elm$core$List$cons,
-			{c: tail, ay: pIdx},
-			sentencesRev);
-		return $elm$core$List$reverse(withTail);
-	});
-var $author$project$Convert$blankLineRegex = A2(
-	$elm$core$Maybe$withDefault,
-	$elm$regex$Regex$never,
-	$elm$regex$Regex$fromString('\u005Cn\u005Cs*\u005Cn'));
-var $author$project$Convert$blankLineSplitRegex = A2(
-	$elm$core$Maybe$withDefault,
-	$elm$regex$Regex$never,
-	$elm$regex$Regex$fromString('\u005Cn\u005Cs*\u005Cn+'));
-var $author$project$Convert$singleNewlineSplitRegex = A2(
-	$elm$core$Maybe$withDefault,
-	$elm$regex$Regex$never,
-	$elm$regex$Regex$fromString('\u005Cn+'));
-var $author$project$Convert$splitSentences = function (text) {
-	if (text === '') {
+var $author$project$Main$startNextBatch = function (model) {
+	var _v0 = model.au;
+	if (!_v0.b) {
+		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+	} else {
+		var batch = _v0.a;
+		var rest = _v0.b;
+		var keys = A2(
+			$elm$core$List$map,
+			function ($) {
+				return $.c;
+			},
+			batch);
+		var tokensBySentence = A3(
+			$elm$core$List$foldl,
+			F2(
+				function (key, d) {
+					return A3($elm$core$Dict$insert, key, $author$project$Main$Loading, d);
+				}),
+			model.x,
+			keys);
+		var cmd = $elm$core$Platform$Cmd$batch(
+			A2($elm$core$List$map, $author$project$Main$fetchTokens, keys));
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{af: keys, x: tokensBySentence, au: rest}),
+			cmd);
+	}
+};
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$Convert$groupByParagraph = function (sentences) {
+	if (!sentences.b) {
 		return _List_Nil;
 	} else {
-		var hasBlankLines = A2($elm$regex$Regex$contains, $author$project$Convert$blankLineRegex, text);
-		var paraBlocks = hasBlankLines ? A2($elm$regex$Regex$split, $author$project$Convert$blankLineSplitRegex, text) : A2($elm$regex$Regex$split, $author$project$Convert$singleNewlineSplitRegex, text);
-		return $elm$core$List$concat(
-			A2($elm$core$List$indexedMap, $author$project$Convert$splitBlock, paraBlocks));
+		var first = sentences.a;
+		return A2(
+			$elm$core$List$map,
+			$elm$core$Tuple$second,
+			A3(
+				$elm$core$List$foldr,
+				F2(
+					function (s, acc) {
+						if (acc.b) {
+							var _v2 = acc.a;
+							var paragraph = _v2.a;
+							var group = _v2.b;
+							var rest = acc.b;
+							return _Utils_eq(paragraph, s.aA) ? A2(
+								$elm$core$List$cons,
+								_Utils_Tuple2(
+									paragraph,
+									A2($elm$core$List$cons, s, group)),
+								rest) : A2(
+								$elm$core$List$cons,
+								_Utils_Tuple2(
+									s.aA,
+									_List_fromArray(
+										[s])),
+								A2(
+									$elm$core$List$cons,
+									_Utils_Tuple2(paragraph, group),
+									rest));
+						} else {
+							return _List_fromArray(
+								[
+									_Utils_Tuple2(
+									s.aA,
+									_List_fromArray(
+										[s]))
+								]);
+						}
+					}),
+				_List_Nil,
+				sentences));
 	}
 };
 var $author$project$Main$submit = function (model) {
 	var sentences = $author$project$Convert$splitSentences(model.c);
-	var newEntries = A2(
-		$elm$core$List$filterMap,
-		function (s) {
-			return A2($elm$core$Dict$member, s.c, model.x) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(s.c);
-		},
-		sentences);
-	var tokensBySentence = A3(
-		$elm$core$List$foldl,
-		F2(
-			function (key, d) {
-				return A3($elm$core$Dict$insert, key, $author$project$Main$Loading, d);
-			}),
-		model.x,
-		newEntries);
-	var cmd = $elm$core$Platform$Cmd$batch(
-		A2($elm$core$List$map, $author$project$Main$fetchTokens, newEntries));
-	return _Utils_Tuple2(
+	var paragraphs = $author$project$Convert$groupByParagraph(sentences);
+	var isNew = function (s) {
+		return !A2($elm$core$Dict$member, s.c, model.x);
+	};
+	var pendingParagraphs = A2(
+		$elm$core$List$filter,
+		A2($elm$core$Basics$composeL, $elm$core$Basics$not, $elm$core$List$isEmpty),
+		A2(
+			$elm$core$List$map,
+			$elm$core$List$filter(isNew),
+			paragraphs));
+	return $author$project$Main$startNextBatch(
 		_Utils_update(
 			model,
-			{U: -1, D: sentences, V: model.c, x: tokensBySentence}),
-		cmd);
+			{U: -1, D: sentences, V: model.c, af: _List_Nil, au: pendingParagraphs}));
 };
 var $author$project$Main$lineText = F2(
 	function (tokens, toneMode) {
@@ -8211,10 +8298,6 @@ var $author$project$Main$lineText = F2(
 		return han + ('\u000A' + romaji);
 	});
 var $author$project$Ports$copyToClipboard = _Platform_outgoingPort('copyToClipboard', $elm$json$Json$Encode$string);
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $author$project$Main$buildCopyAllLines = F3(
 	function (sentences, tokensBySentence, toneMode) {
 		var step = F2(
@@ -8223,7 +8306,7 @@ var $author$project$Main$buildCopyAllLines = F3(
 				var acc = _v1.b;
 				var paraBreak = ((!_Utils_eq(
 					prevPara,
-					$elm$core$Maybe$Just(sentence.ay))) && (!_Utils_eq(prevPara, $elm$core$Maybe$Nothing))) ? _List_fromArray(
+					$elm$core$Maybe$Just(sentence.aA))) && (!_Utils_eq(prevPara, $elm$core$Maybe$Nothing))) ? _List_fromArray(
 					['']) : _List_Nil;
 				var line = function () {
 					var _v0 = A2($elm$core$Dict$get, sentence.c, tokensBySentence);
@@ -8235,7 +8318,7 @@ var $author$project$Main$buildCopyAllLines = F3(
 					}
 				}();
 				return _Utils_Tuple2(
-					$elm$core$Maybe$Just(sentence.ay),
+					$elm$core$Maybe$Just(sentence.aA),
 					_Utils_ap(
 						acc,
 						_Utils_ap(
@@ -8420,6 +8503,12 @@ var $author$project$Main$update = F2(
 				case 7:
 					var sentence = msg.a;
 					var result = msg.b;
+					var stillWaiting = A2(
+						$elm$core$List$filter,
+						function (t) {
+							return !_Utils_eq(t, sentence);
+						},
+						model.af);
 					var remote = function () {
 						if (!result.$) {
 							var toks = result.a;
@@ -8430,13 +8519,13 @@ var $author$project$Main$update = F2(
 								$author$project$Main$httpErrorToString(err));
 						}
 					}();
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								x: A3($elm$core$Dict$insert, sentence, remote, model.x)
-							}),
-						$elm$core$Platform$Cmd$none);
+					var model1 = _Utils_update(
+						model,
+						{
+							af: stillWaiting,
+							x: A3($elm$core$Dict$insert, sentence, remote, model.x)
+						});
+					return $elm$core$List$isEmpty(stillWaiting) ? $author$project$Main$startNextBatch(model1) : _Utils_Tuple2(model1, $elm$core$Platform$Cmd$none);
 				case 8:
 					var idx = msg.a;
 					return _Utils_Tuple2(
@@ -8458,7 +8547,7 @@ var $author$project$Main$update = F2(
 							model,
 							{
 								ac: $elm$core$Maybe$Just(
-									{au: key, al: token})
+									{aw: key, am: token})
 							}),
 						$elm$core$Platform$Cmd$none);
 				case 11:
@@ -8471,7 +8560,7 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{ap: true}),
+							{aq: true}),
 						$elm$core$Platform$Cmd$batch(
 							_List_fromArray(
 								[
@@ -8482,7 +8571,7 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{ap: false}),
+							{aq: false}),
 						$elm$core$Platform$Cmd$none);
 				case 14:
 					var idx = msg.a;
@@ -8559,7 +8648,7 @@ var $elm$core$String$isEmpty = function (string) {
 };
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aT: host, aU: path, a4: port_, a5: query, bf: fragment, bi: protocol};
+		return {aV: host, aW: path, a6: port_, a7: query, bh: fragment, bk: protocol};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$url$Url$chompBeforePath = F5(
@@ -8671,5 +8760,5 @@ var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$none;
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{bG: $author$project$Main$init, bO: $author$project$Main$view, b5: $author$project$Main$update, cz: $author$project$Main$subscriptions});
+	{bI: $author$project$Main$init, bQ: $author$project$Main$view, b7: $author$project$Main$update, cB: $author$project$Main$subscriptions});
 _Platform_export({'Main':{'init':$author$project$Main$main($elm$json$Json$Decode$value)(0)}});}(this));

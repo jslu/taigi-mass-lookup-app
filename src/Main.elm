@@ -39,6 +39,8 @@ type alias Model =
     , submitted : String
     , sentences : List Sentence
     , tokensBySentence : Dict String RemoteTokens
+    , pendingParagraphs : List (List Sentence)
+    , currentBatch : List String
     , activeIdx : Int
     , layout : Layout
     , toneMode : ToneMode
@@ -63,6 +65,8 @@ init storedTweaks =
       , submitted = ""
       , sentences = []
       , tokensBySentence = Dict.empty
+      , pendingParagraphs = []
+      , currentBatch = []
       , activeIdx = -1
       , layout = layout
       , toneMode = toneMode
@@ -162,10 +166,21 @@ update msg model =
 
                         Err err ->
                             Failed (httpErrorToString err)
+
+                stillWaiting =
+                    List.filter (\t -> t /= sentence) model.currentBatch
+
+                model1 =
+                    { model
+                        | tokensBySentence = Dict.insert sentence remote model.tokensBySentence
+                        , currentBatch = stillWaiting
+                    }
             in
-            ( { model | tokensBySentence = Dict.insert sentence remote model.tokensBySentence }
-            , Cmd.none
-            )
+            if List.isEmpty stillWaiting then
+                startNextBatch model1
+
+            else
+                ( model1, Cmd.none )
 
         ActivateRow idx ->
             ( { model | activeIdx = idx }, Cmd.none )
@@ -218,37 +233,68 @@ update msg model =
             )
 
 
+{-| Split the submitted text into sentences, then fetch them one paragraph
+at a time: all sentences belonging to the first paragraph are requested
+concurrently, and the next paragraph's batch only starts once every
+sentence in the current batch has settled (loaded or failed). Already-
+converted sentences (e.g. re-submitting text that shares a prefix with a
+prior submission) are skipped and don't block their paragraph's batch.
+-}
 submit : Model -> ( Model, Cmd Msg )
 submit model =
     let
         sentences =
             Convert.splitSentences model.text
 
-        newEntries =
-            sentences
-                |> List.filterMap
-                    (\s ->
-                        if Dict.member s.text model.tokensBySentence then
-                            Nothing
+        paragraphs =
+            Convert.groupByParagraph sentences
 
-                        else
-                            Just s.text
-                    )
+        isNew s =
+            not (Dict.member s.text model.tokensBySentence)
 
-        tokensBySentence =
-            List.foldl (\key d -> Dict.insert key Loading d) model.tokensBySentence newEntries
-
-        cmd =
-            Cmd.batch (List.map fetchTokens newEntries)
+        pendingParagraphs =
+            paragraphs
+                |> List.map (List.filter isNew)
+                |> List.filter (not << List.isEmpty)
     in
-    ( { model
-        | submitted = model.text
-        , sentences = sentences
-        , tokensBySentence = tokensBySentence
-        , activeIdx = -1
-      }
-    , cmd
-    )
+    startNextBatch
+        { model
+            | submitted = model.text
+            , sentences = sentences
+            , pendingParagraphs = pendingParagraphs
+            , currentBatch = []
+            , activeIdx = -1
+        }
+
+
+{-| Pop the next paragraph's sentences off the queue, mark them `Loading`,
+and fire their HTTP requests concurrently. If the queue is empty (all
+paragraphs have been dispatched already), this is a no-op.
+-}
+startNextBatch : Model -> ( Model, Cmd Msg )
+startNextBatch model =
+    case model.pendingParagraphs of
+        [] ->
+            ( model, Cmd.none )
+
+        batch :: rest ->
+            let
+                keys =
+                    List.map .text batch
+
+                tokensBySentence =
+                    List.foldl (\key d -> Dict.insert key Loading d) model.tokensBySentence keys
+
+                cmd =
+                    Cmd.batch (List.map fetchTokens keys)
+            in
+            ( { model
+                | pendingParagraphs = rest
+                , currentBatch = keys
+                , tokensBySentence = tokensBySentence
+              }
+            , cmd
+            )
 
 
 saveTweaksCmd : Layout -> ToneMode -> Cmd Msg

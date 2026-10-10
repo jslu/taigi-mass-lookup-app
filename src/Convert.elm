@@ -1,6 +1,7 @@
 module Convert exposing
     ( Sentence
     , Token
+    , groupByParagraph
     , isPunct
     , parseFenchi
     , splitSentences
@@ -122,6 +123,37 @@ stepChar pIdx ch ( acc, buf ) =
 
         else
             ( acc, buf2 )
+
+
+{-| Group a (paragraph-ordered) list of sentences into one sub-list per
+paragraph, preserving sentence order within each paragraph and paragraph
+order overall. Sentences are assumed to already be in paragraph order (as
+produced by `splitSentences`), so this only needs to split on paragraph-
+index changes rather than sort/group by key.
+-}
+groupByParagraph : List Sentence -> List (List Sentence)
+groupByParagraph sentences =
+    case sentences of
+        [] ->
+            []
+
+        first :: _ ->
+            sentences
+                |> List.foldr
+                    (\s acc ->
+                        case acc of
+                            ( paragraph, group ) :: rest ->
+                                if paragraph == s.paragraph then
+                                    ( paragraph, s :: group ) :: rest
+
+                                else
+                                    ( s.paragraph, [ s ] ) :: ( paragraph, group ) :: rest
+
+                            [] ->
+                                [ ( s.paragraph, [ s ] ) ]
+                    )
+                    []
+                |> List.map Tuple.second
 
 
 {-| ithuan returns 分詞 as space-separated "han｜tailo" tokens, where multi-

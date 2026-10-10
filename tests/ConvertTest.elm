@@ -66,4 +66,51 @@ suite =
             , test "a han word is not punctuation" <|
                 \_ -> Convert.isPunct { han = "食", tailo = "tsia̍h", gloss = "" } |> Expect.equal False
             ]
+        , describe "groupByParagraph"
+            [ test "empty list yields no groups" <|
+                \_ -> Convert.groupByParagraph [] |> Expect.equal []
+            , test "single paragraph with multiple sentences stays in one group" <|
+                \_ ->
+                    Convert.groupByParagraph
+                        [ { text = "A", paragraph = 0 }
+                        , { text = "B", paragraph = 0 }
+                        ]
+                        |> Expect.equal
+                            [ [ { text = "A", paragraph = 0 }
+                              , { text = "B", paragraph = 0 }
+                              ]
+                            ]
+            , test "splits into one group per paragraph, preserving order" <|
+                \_ ->
+                    Convert.groupByParagraph
+                        [ { text = "A", paragraph = 0 }
+                        , { text = "B", paragraph = 0 }
+                        , { text = "C", paragraph = 1 }
+                        , { text = "D", paragraph = 2 }
+                        , { text = "E", paragraph = 2 }
+                        ]
+                        |> Expect.equal
+                            [ [ { text = "A", paragraph = 0 }
+                              , { text = "B", paragraph = 0 }
+                              ]
+                            , [ { text = "C", paragraph = 1 } ]
+                            , [ { text = "D", paragraph = 2 }
+                              , { text = "E", paragraph = 2 }
+                              ]
+                            ]
+            , test "a single-sentence paragraph becomes a singleton group" <|
+                \_ ->
+                    Convert.groupByParagraph [ { text = "A", paragraph = 0 } ]
+                        |> Expect.equal [ [ { text = "A", paragraph = 0 } ] ]
+            , test "round trip through splitSentences for a two-paragraph passage" <|
+                \_ ->
+                    Convert.splitSentences "第一段。第二句。\n\n第二段。"
+                        |> Convert.groupByParagraph
+                        |> Expect.equal
+                            [ [ { text = "第一段。", paragraph = 0 }
+                              , { text = "第二句。", paragraph = 0 }
+                              ]
+                            , [ { text = "第二段。", paragraph = 1 } ]
+                            ]
+            ]
         ]
