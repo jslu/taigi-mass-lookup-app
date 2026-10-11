@@ -210,6 +210,105 @@
 }
 
 /* ==========================================================================
+   Dark theme — overrides of the semantic tokens above (palette primitives
+   like --uBlue-*, --neutral-*, --green-* etc. are unchanged; only the
+   semantic text/surface/border tokens that reference them are redefined).
+
+   Applied two ways so both explicit and "System" theme selection work:
+     1. :root[data-theme="dark"]            — explicit user choice
+     2. prefers-color-scheme + :not([data-theme]) — System, follows the OS
+        live (no JS listener needed; this is a plain media query)
+   ========================================================================== */
+:root[data-theme="dark"] {
+  /* ==== Semantic tokens — text (alpha on black → alpha on white) ====
+     The dark palette reuses the existing --text-inverse-* scale as its
+     *primary* text tokens (white-on-dark), and repoints --text-inverse-*
+     back to the alpha-on-black scale for anything that explicitly wants
+     an "inverse" (e.g. text drawn on a light chip inside dark mode). */
+  --text-00: rgba(255,255,255,1);
+  --text-01: rgba(255,255,255,0.85);
+  --text-02: rgba(255,255,255,0.65);
+  --text-03: rgba(255,255,255,0.45);
+  --text-04: rgba(255,255,255,0.20);
+
+  --text-inverse-00: rgba(0,0,0,1);
+  --text-inverse-01: rgba(0,0,0,0.85);
+  --text-inverse-02: rgba(0,0,0,0.65);
+  --text-inverse-03: rgba(0,0,0,0.45);
+
+  /* ==== Semantic tokens — surfaces ====
+     Derived from near-black grays (not pure black) so shadows/borders
+     still read against the surface. */
+  --bg-base:      rgb(30,31,34);     /* cards, popovers */
+  --bg-shell:     rgb(18,18,20);     /* app background */
+  --bg-subtle:    rgb(38,39,43);
+  --bg-muted:     rgb(46,47,51);
+  --bg-hover:     rgb(46,47,51);
+  --bg-selected:  rgb(20,36,59);     /* dark tint of --bg-selected's blue */
+
+  --border-subtle:  rgb(42,43,47);
+  --border-default: rgb(58,59,64);
+  --border-strong:  var(--neutral-07);
+
+  /* ==== Semantic roles — brighten the brand blue so it still meets
+     ~4.5:1 contrast against the dark surfaces above (uBlue-06 alone
+     drops to ~2.5:1 on a dark background). ==== */
+  --color-primary:       var(--uBlue-05);
+  --color-primary-hover: hsl(214, 100%, 66%);
+  --color-primary-active: var(--uBlue-04);
+  --color-link:          var(--uBlue-05);
+  --color-link-hover:    var(--uBlue-04);
+
+  /* ==== Shadows — lighten opacity motif for dark surfaces ==== */
+  --shadow-initial:  0 0 1px 0 rgba(0,0,0,0.3);
+  --shadow-superlow: 0 4px 12px 0 rgba(0,0,0,0.3), 0 0 1px 0 rgba(0,0,0,0.3);
+  --shadow-low:      0 8px 24px 0 rgba(0,0,0,0.3), 0 0 1px 0 rgba(0,0,0,0.3);
+  --shadow-high:     0 12px 48px 0 rgba(0,0,0,0.4), 0 0 1px 0 rgba(0,0,0,0.3);
+}
+
+/* Same overrides as above, applied for "System" theme (no explicit
+   data-theme attribute) when the OS reports a dark color scheme. Kept as a
+   literal duplicate rather than shared via a class, since plain CSS custom
+   properties have no mixin/extend mechanism and this file has no build
+   step (loaded directly via <link>, no Sass/PostCSS). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --text-00: rgba(255,255,255,1);
+    --text-01: rgba(255,255,255,0.85);
+    --text-02: rgba(255,255,255,0.65);
+    --text-03: rgba(255,255,255,0.45);
+    --text-04: rgba(255,255,255,0.20);
+
+    --text-inverse-00: rgba(0,0,0,1);
+    --text-inverse-01: rgba(0,0,0,0.85);
+    --text-inverse-02: rgba(0,0,0,0.65);
+    --text-inverse-03: rgba(0,0,0,0.45);
+
+    --bg-base:      rgb(30,31,34);
+    --bg-shell:     rgb(18,18,20);
+    --bg-subtle:    rgb(38,39,43);
+    --bg-muted:     rgb(46,47,51);
+    --bg-hover:     rgb(46,47,51);
+    --bg-selected:  rgb(20,36,59);
+
+    --border-subtle:  rgb(42,43,47);
+    --border-default: rgb(58,59,64);
+    --border-strong:  var(--neutral-07);
+
+    --color-primary:       var(--uBlue-05);
+    --color-primary-hover: hsl(214, 100%, 66%);
+    --color-primary-active: var(--uBlue-04);
+    --color-link:          var(--uBlue-05);
+    --color-link-hover:    var(--uBlue-04);
+
+    --shadow-initial:  0 0 1px 0 rgba(0,0,0,0.3);
+    --shadow-superlow: 0 4px 12px 0 rgba(0,0,0,0.3), 0 0 1px 0 rgba(0,0,0,0.3);
+    --shadow-low:      0 8px 24px 0 rgba(0,0,0,0.3), 0 0 1px 0 rgba(0,0,0,0.3);
+    --shadow-high:     0 12px 48px 0 rgba(0,0,0,0.4), 0 0 1px 0 rgba(0,0,0,0.3);
+  }
+}
+
+/* ==========================================================================
    Semantic element defaults (type scale)
    ========================================================================== */
 html, body {

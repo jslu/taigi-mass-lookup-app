@@ -56,6 +56,71 @@ html, body {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* ── Theme switcher ─────────────────────────────────────────────────── */
+.theme-switcher {
+  position: relative;
+}
+.theme-switcher-trigger {
+  width: 28px;
+  height: 28px;
+  font-size: 15px;
+}
+.theme-switcher-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1190;
+  background: transparent;
+}
+.theme-switcher-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1200;
+  min-width: 140px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: var(--shadow-high);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  animation: popIn 150ms var(--ease-standard);
+}
+.theme-switcher-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text-01);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--timing-fast) var(--ease-standard);
+}
+.theme-switcher-item:hover {
+  background: var(--bg-hover);
+}
+.theme-switcher-item.is-active {
+  color: var(--uBlue-06);
+  font-weight: 600;
+}
+.theme-switcher-item-check {
+  width: 14px;
+  flex-shrink: 0;
+  font-size: 12px;
+  text-align: center;
+}
 
 /* ── Input card ─────────────────────────────────────────────────────── */
 .input-card {
@@ -71,7 +136,7 @@ html, body {
   justify-content: space-between;
   padding: 10px 16px;
   border-bottom: 1px solid var(--border-subtle);
-  background: var(--neutral-01);
+  background: var(--bg-subtle);
 }
 .input-toolbar-left {
   display: flex;
@@ -114,7 +179,7 @@ html, body {
   justify-content: space-between;
   padding: 10px 16px;
   border-top: 1px solid var(--border-subtle);
-  background: var(--neutral-01);
+  background: var(--bg-subtle);
   font-size: 11px;
   color: var(--text-03);
 }
@@ -147,25 +212,25 @@ html, body {
 .btn-primary:hover { background: var(--color-primary-hover); }
 .btn-primary:active { background: var(--uBlue-07); }
 .btn-primary:disabled {
-  background: var(--neutral-03);
+  background: var(--bg-muted);
   color: var(--text-04);
   cursor: not-allowed;
 }
 .btn-secondary {
   background: var(--bg-base);
-  border-color: var(--neutral-04);
+  border-color: var(--border-default);
   color: var(--text-01);
 }
 .btn-secondary:hover {
-  background: var(--neutral-02);
-  border-color: var(--neutral-05);
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
 }
 .btn-ghost {
   background: transparent;
   color: var(--text-02);
 }
 .btn-ghost:hover {
-  background: var(--neutral-02);
+  background: var(--bg-hover);
   color: var(--text-01);
 }
 .btn-large {
@@ -218,7 +283,7 @@ html, body {
 }
 .seg-toggle {
   display: inline-flex;
-  background: var(--neutral-02);
+  background: var(--bg-subtle);
   border-radius: 4px;
   padding: 2px;
   gap: 2px;
@@ -237,7 +302,7 @@ html, body {
 }
 .seg-toggle button:hover { color: var(--text-01); }
 .seg-toggle button.is-active {
-  background: white;
+  background: var(--bg-base);
   color: var(--text-00);
   box-shadow: var(--shadow-superlow);
   cursor: default;
@@ -303,7 +368,7 @@ html, body {
   transition: all var(--timing-fast) var(--ease-standard);
 }
 .icon-btn:hover {
-  background: var(--neutral-02);
+  background: var(--bg-hover);
   color: var(--text-01);
 }
 .icon-btn.copied {
@@ -319,6 +384,7 @@ html, body {
   line-height: 1;
 }
 .ruby-token {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -326,14 +392,25 @@ html, body {
   margin: 0 1px;
   border-radius: 3px;
   cursor: pointer;
-  transition: background var(--timing-fast) var(--ease-standard);
+  transition: background var(--timing-fast) var(--ease-standard),
+              box-shadow var(--timing-fast) var(--ease-standard);
   min-width: 0;
 }
 .ruby-token:hover {
-  background: var(--uBlue-01);
+  background: var(--bg-hover);
 }
 .ruby-token.is-selected {
-  background: var(--uBlue-02);
+  /* A plain --bg-selected fill is indistinguishable from the sentence
+     row's own hover/active background (both use the same token), so the
+     selected word needs its own distinct signal: a solid brand-color
+     ring plus a low-opacity tint of that same color, which reads clearly
+     against any row state in both themes. box-shadow (not border) is
+     used for the ring so it doesn't shift layout/alignment. */
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--color-primary);
+}
+.ruby-token.is-selected .ruby-romaji {
+  color: var(--color-link);
 }
 .ruby-token.punct {
   cursor: default;
@@ -388,17 +465,21 @@ html, body {
   letter-spacing: 0.01em;
 }
 .stacked-token, .side-token {
-  display: inline;
+  position: relative;
+  display: inline-block;
   padding: 1px 1px;
   border-radius: 3px;
   cursor: pointer;
-  transition: background var(--timing-fast) var(--ease-standard);
+  transition: background var(--timing-fast) var(--ease-standard),
+              box-shadow var(--timing-fast) var(--ease-standard);
 }
 .stacked-token:hover, .side-token:hover {
-  background: var(--uBlue-01);
+  background: var(--bg-hover);
 }
 .stacked-token.is-selected, .side-token.is-selected {
-  background: var(--uBlue-02);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--color-primary);
+  color: var(--color-link);
 }
 .stacked-token.punct, .side-token.punct { cursor: default; }
 .stacked-token.punct:hover, .side-token.punct:hover { background: transparent; }
@@ -441,7 +522,7 @@ html, body {
 }
 .table-row:last-child { border-bottom: none; }
 .table-label {
-  background: var(--neutral-01);
+  background: var(--bg-subtle);
   padding: 10px 12px;
   font-size: 11px;
   letter-spacing: 0.04em;
@@ -475,7 +556,7 @@ html, body {
 .paragraph-break .pb-line {
   flex: 1 1 auto;
   height: 1px;
-  background: var(--neutral-04);
+  background: var(--border-default);
   min-width: 12px;
 }
 .paragraph-break .pb-mark {
@@ -523,8 +604,18 @@ html, body {
 }
 
 /* ── Word popover ───────────────────────────────────────────────────── */
+/* Anchored to the clicked token itself (its nearest `position: relative`
+   ancestor is `.ruby-token` / `.stacked-token` / `.side-token`, not the
+   whole sentence row), so it always opens directly under the word that
+   was clicked rather than at a fixed spot in the row. Horizontal
+   centering + a generous max-width keeps it from overflowing the
+   viewport for tokens near either edge in most layouts; `cursor: text`
+   (not `pointer`) signals its content isn't itself clickable. */
 .word-popover {
   position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1200;
   min-width: 220px;
   max-width: 320px;
@@ -533,11 +624,16 @@ html, body {
   border-radius: 8px;
   box-shadow: var(--shadow-high);
   padding: 14px 16px;
-  animation: popIn 150ms var(--ease-standard);
+  cursor: default;
+  animation: wordPopoverPopIn 150ms var(--ease-standard);
 }
 @keyframes popIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+@keyframes wordPopoverPopIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 .word-popover .pop-han {
   font-size: 22px;
