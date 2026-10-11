@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Events
 import Convert exposing (Sentence, Token)
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, h1, h3, header, p, span, text, textarea)
@@ -14,7 +15,7 @@ import Ports
 import Process
 import Tailo exposing (ToneMode(..))
 import Task
-import Tokens exposing (Layout(..))
+import Tokens exposing (Layout(..), ThemeMode(..))
 import Url
 
 
@@ -47,6 +48,8 @@ type alias Model =
     , selected : Maybe Selection
     , copiedAll : Bool
     , copiedLineIdx : Maybe Int
+    , theme : ThemeMode
+    , themeMenuOpen : Bool
     }
 
 
@@ -58,7 +61,7 @@ sample =
 init : Decode.Value -> ( Model, Cmd Msg )
 init storedTweaks =
     let
-        ( layout, toneMode ) =
+        ( layout, toneMode, theme ) =
             decodeTweaks storedTweaks
     in
     ( { text = ""
@@ -73,12 +76,14 @@ init storedTweaks =
       , selected = Nothing
       , copiedAll = False
       , copiedLineIdx = Nothing
+      , theme = theme
+      , themeMenuOpen = False
       }
-    , Cmd.none
+    , applyThemeCmd theme
     )
 
 
-decodeTweaks : Decode.Value -> ( Layout, ToneMode )
+decodeTweaks : Decode.Value -> ( Layout, ToneMode, ThemeMode )
 decodeTweaks value =
     let
         layout =
@@ -90,8 +95,13 @@ decodeTweaks value =
             Decode.decodeValue (Decode.field "toneMode" Decode.string) value
                 |> Result.map Tokens.toneModeFromString
                 |> Result.withDefault Diacritic
+
+        theme =
+            Decode.decodeValue (Decode.field "theme" Decode.string) value
+                |> Result.map Tokens.themeModeFromString
+                |> Result.withDefault SystemTheme
     in
-    ( layout, toneMode )
+    ( layout, toneMode, theme )
 
 
 
@@ -116,6 +126,9 @@ type Msg
     | CopyLine Int
     | CopyLineDone Int
     | RetrySentence String
+    | ToggleThemeMenu
+    | CloseThemeMenu
+    | SetTheme ThemeMode
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -152,10 +165,10 @@ update msg model =
             )
 
         SetLayout layout ->
-            ( { model | layout = layout }, saveTweaksCmd layout model.toneMode )
+            ( { model | layout = layout }, saveTweaksCmd layout model.toneMode model.theme )
 
         SetToneMode toneMode ->
-            ( { model | toneMode = toneMode }, saveTweaksCmd model.layout toneMode )
+            ( { model | toneMode = toneMode }, saveTweaksCmd model.layout toneMode model.theme )
 
         GotTokens sentence result ->
             let
@@ -232,6 +245,17 @@ update msg model =
             , fetchTokens sentence
             )
 
+        ToggleThemeMenu ->
+            ( { model | themeMenuOpen = not model.themeMenuOpen }, Cmd.none )
+
+        CloseThemeMenu ->
+            ( { model | themeMenuOpen = False }, Cmd.none )
+
+        SetTheme theme ->
+            ( { model | theme = theme, themeMenuOpen = False }
+            , Cmd.batch [ saveTweaksCmd model.layout model.toneMode theme, applyThemeCmd theme ]
+            )
+
 
 {-| Split the submitted text into sentences, then fetch them one paragraph
 at a time: all sentences belonging to the first paragraph are requested
@@ -297,13 +321,33 @@ startNextBatch model =
             )
 
 
-saveTweaksCmd : Layout -> ToneMode -> Cmd Msg
-saveTweaksCmd layout toneMode =
+saveTweaksCmd : Layout -> ToneMode -> ThemeMode -> Cmd Msg
+saveTweaksCmd layout toneMode theme =
     Ports.saveTweaks
         (Encode.object
             [ ( "layout", Encode.string (Tokens.layoutToString layout) )
             , ( "toneMode", Encode.string (Tokens.toneModeToString toneMode) )
+            , ( "theme", Encode.string (Tokens.themeModeToString theme) )
             ]
+        )
+
+
+{-| Tell the JS side (via `Ports.setThemeAttribute`) what `data-theme` to
+set on `<html>`. `SystemTheme` sends "" to clear the attribute, letting the
+CSS `prefers-color-scheme` media query take over.
+-}
+applyThemeCmd : ThemeMode -> Cmd Msg
+applyThemeCmd theme =
+    Ports.setThemeAttribute
+        (case theme of
+            Light ->
+                "light"
+
+            Dark ->
+                "dark"
+
+            SystemTheme ->
+                ""
         )
 
 
@@ -442,9 +486,19 @@ httpErrorToString err =
 -- SUBSCRIPTIONS
 
 
+{-| Close the word popover on any click that isn't handled (and stopped)
+by the popover itself or the token that opened it — this is the Elm
+equivalent of the original React app's `document.addEventListener
+('mousedown', ...)` "click outside to close" handler. Only subscribed
+while a popover is actually open, so it adds no overhead otherwise.
+-}
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    if model.selected /= Nothing then
+        Browser.Events.onClick (Decode.succeed ClosePopover)
+
+    else
+        Sub.none
 
 
 
@@ -454,15 +508,15 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     div [ class "app-shell" ]
-        [ viewHeader
+        [ viewHeader model
         , viewInputCard model
         , viewResultsOrEmpty model
         , viewFootNote
         ]
 
 
-viewHeader : Html Msg
-viewHeader =
+viewHeader : Model -> Html Msg
+viewHeader model =
     header [ class "app-header" ]
         [ div []
             [ h1 [ class "app-title" ]
@@ -473,8 +527,113 @@ viewHeader =
             , div [ class "app-subtitle" ]
                 [ text "Paste any 台語文 passage — get sentence-by-sentence 漢字 ↔ Tâi-lô." ]
             ]
-        , div [ class "brand-mark" ] [ text "台羅 · Hàn-lô" ]
+        , div [ class "app-header-right" ]
+            [ div [ class "brand-mark" ] [ text "台羅 · Hàn-lô" ]
+            , viewThemeSwitcher model
+            ]
         ]
+
+
+{-| Icon button + dropdown for choosing Light / Dark / System. The dropdown
+is closed by default; clicking the icon toggles it, clicking an option
+applies it and closes it, and clicking anywhere else on the page closes it
+via a full-viewport transparent overlay rendered behind the menu (standard
+Elm idiom for "click outside to close" — no JS listener needed).
+-}
+viewThemeSwitcher : Model -> Html Msg
+viewThemeSwitcher model =
+    div [ class "theme-switcher" ]
+        (button
+            [ class "icon-btn theme-switcher-trigger"
+            , onClick ToggleThemeMenu
+            , Attr.title "Theme"
+            , Attr.attribute "aria-label" "Theme"
+            , Attr.attribute "aria-haspopup" "true"
+            , Attr.attribute "aria-expanded" (boolToString model.themeMenuOpen)
+            ]
+            [ themeIcon model.theme ]
+            :: (if model.themeMenuOpen then
+                    [ viewThemeMenuOverlay
+                    , viewThemeMenu model.theme
+                    ]
+
+                else
+                    []
+               )
+        )
+
+
+viewThemeMenuOverlay : Html Msg
+viewThemeMenuOverlay =
+    div [ class "theme-switcher-overlay", onClick CloseThemeMenu ] []
+
+
+viewThemeMenu : ThemeMode -> Html Msg
+viewThemeMenu current =
+    div
+        [ class "theme-switcher-menu"
+        , Attr.attribute "role" "menu"
+        , Attr.attribute "aria-label" "Theme"
+        ]
+        (List.map (viewThemeMenuItem current)
+            [ ( Light, "Light" )
+            , ( Dark, "Dark" )
+            , ( SystemTheme, "System" )
+            ]
+        )
+
+
+viewThemeMenuItem : ThemeMode -> ( ThemeMode, String ) -> Html Msg
+viewThemeMenuItem current ( mode, label ) =
+    let
+        isActive =
+            current == mode
+    in
+    button
+        [ class
+            ("theme-switcher-item"
+                ++ (if isActive then
+                        " is-active"
+
+                    else
+                        ""
+                   )
+            )
+        , Attr.attribute "role" "menuitemradio"
+        , Attr.attribute "aria-checked" (boolToString isActive)
+        , onClick (SetTheme mode)
+        ]
+        [ span [ class "theme-switcher-item-check" ]
+            [ text
+                (if isActive then
+                    "✓"
+
+                 else
+                    ""
+                )
+            ]
+        , span [] [ text label ]
+        ]
+
+
+{-| Sun / moon / monitor glyph for the trigger button. Kept as plain text
+glyphs to match the rest of the app's icon style (inline SVGs elsewhere are
+simple too; these are simpler still and render consistently across
+platforms without needing a bundled icon font).
+-}
+themeIcon : ThemeMode -> Html Msg
+themeIcon theme =
+    text
+        (case theme of
+            Light ->
+                "☀"
+
+            Dark ->
+                "☽"
+
+            SystemTheme ->
+                "◑"
+        )
 
 
 viewInputCard : Model -> Html Msg
@@ -728,7 +887,6 @@ viewSentenceRow model idx sentence =
                     )
                 ]
             ]
-        , viewPopoverFor model idx remote
         ]
 
 
@@ -839,6 +997,17 @@ isSelected model key =
             False
 
 
+{-| Like `onClick`, but stops the click from bubbling up to the
+document-level listener in `subscriptions` that closes the popover.
+Without this, clicking a token (or a spot inside the already-open
+popover) would immediately re-close whatever popover that click just
+opened, since both handlers would fire for the same click event.
+-}
+onClickStopPropagation : Msg -> Html.Attribute Msg
+onClickStopPropagation msg =
+    Html.Events.stopPropagationOn "click" (Decode.succeed ( msg, True ))
+
+
 viewRubyLine : Model -> Int -> List Token -> Html Msg
 viewRubyLine model lineIdx tokens =
     div [ class "ruby-line taigi-text" ]
@@ -875,7 +1044,7 @@ viewRubyLine model lineIdx tokens =
                                 []
 
                             else
-                                [ onClick (WordClicked key t) ]
+                                [ onClickStopPropagation (WordClicked key t) ]
                     in
                     span (class classes :: clickAttrs)
                         [ span [ class "ruby-romaji" ]
@@ -891,6 +1060,7 @@ viewRubyLine model lineIdx tokens =
                                 )
                             ]
                         , span [ class "ruby-han taigi-text" ] [ text t.han ]
+                        , viewPopoverFor model key
                         ]
                 )
         )
@@ -930,9 +1100,10 @@ viewStackedLine model lineIdx tokens =
                                     []
 
                                 else
-                                    [ onClick (WordClicked key t) ]
+                                    [ onClickStopPropagation (WordClicked key t) ]
                         in
-                        span (class classes :: clickAttrs) [ text t.han ]
+                        span (class classes :: clickAttrs)
+                            [ text t.han, viewPopoverFor model key ]
                     )
             )
         , div [ class "stacked-romaji" ]
@@ -963,7 +1134,7 @@ viewStackedLine model lineIdx tokens =
                                                 ""
                                            )
                                     )
-                                , onClick (WordClicked key t)
+                                , onClickStopPropagation (WordClicked key t)
                                 ]
                                 [ text
                                     (if tailo /= "" then
@@ -1012,9 +1183,10 @@ viewSideLine model lineIdx tokens =
                                     []
 
                                 else
-                                    [ onClick (WordClicked key t) ]
+                                    [ onClickStopPropagation (WordClicked key t) ]
                         in
-                        span (class classes :: clickAttrs) [ text t.han ]
+                        span (class classes :: clickAttrs)
+                            [ text t.han, viewPopoverFor model key ]
                     )
             )
         , div [ class "side-col-romaji" ]
@@ -1045,7 +1217,7 @@ viewSideLine model lineIdx tokens =
                                                 ""
                                            )
                                     )
-                                , onClick (WordClicked key t)
+                                , onClickStopPropagation (WordClicked key t)
                                 ]
                                 [ text
                                     (if tailo /= "" then
@@ -1099,23 +1271,35 @@ viewTableLine toneMode tokens =
         ]
 
 
-viewPopoverFor : Model -> Int -> Maybe RemoteTokens -> Html Msg
-viewPopoverFor model idx remote =
+{-| Render the popover for a given token, *if* it is the currently
+selected one. Called from inside each clickable token's `span` (Ruby /
+Stacked / Side layouts) so the popover becomes a CSS child of the exact
+token that was clicked — positioning it (via `.word-popover` in
+styles.css: `position: absolute; top: 100%; left: 50%; ...`) relative to
+that token rather than always the start of the sentence row. This also
+means a stale popover cannot "leak" onto a different sentence's layout:
+it only ever renders as a child of the one token whose key matches.
+-}
+viewPopoverFor : Model -> String -> Html Msg
+viewPopoverFor model key =
     case model.selected of
-        Nothing ->
-            text ""
-
         Just sel ->
-            if String.startsWith (String.fromInt idx ++ "-") sel.key then
+            if sel.key == key then
                 viewPopover model.toneMode sel
 
             else
                 text ""
 
+        Nothing ->
+            text ""
+
 
 viewPopover : ToneMode -> Selection -> Html Msg
 viewPopover toneMode sel =
-    div [ class "word-popover" ]
+    div
+        [ class "word-popover"
+        , onClickStopPropagation ClosePopover
+        ]
         [ div [ class "pop-han taigi-text" ] [ text sel.token.han ]
         , div [ class "pop-romaji" ]
             [ text

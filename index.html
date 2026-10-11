@@ -11,6 +11,21 @@
 
 <link rel="stylesheet" href="lib/unifi-tokens.css" />
 <link rel="stylesheet" href="styles.css" />
+<script>
+  // Apply the persisted theme before first paint, so there's no flash of
+  // the wrong theme while main.js loads and Elm mounts. "system" (or no
+  // saved preference) leaves data-theme unset, letting the CSS
+  // prefers-color-scheme media query decide.
+  (function () {
+    try {
+      var raw = localStorage.getItem('taigi-mass-lookup:tweaks');
+      var theme = raw && JSON.parse(raw).theme;
+      if (theme === 'light' || theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    } catch (_) { /* ignore */ }
+  })();
+</script>
 </head>
 <body>
 <div id="root"></div>
@@ -42,6 +57,14 @@
   app.ports.copyToClipboard.subscribe(function (text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text);
+    }
+  });
+
+  app.ports.setThemeAttribute.subscribe(function (theme) {
+    if (theme === 'light' || theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', theme);
+    } else {
+      document.documentElement.removeAttribute('data-theme');
     }
   });
 </script>

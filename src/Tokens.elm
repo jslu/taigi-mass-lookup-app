@@ -1,14 +1,17 @@
 module Tokens exposing
     ( Layout(..)
+    , ThemeMode(..)
     , layoutFromString
     , layoutToString
+    , themeModeFromString
+    , themeModeToString
     , toneModeFromString
     , toneModeToString
     )
 
-{-| String <-> type conversions for the two user-facing preference enums
-(layout choice, tone display mode). Kept separate from `Main` so both the
-model decoder (ports) and the view can share them.
+{-| String <-> type conversions for the user-facing preference enums
+(layout choice, tone display mode, theme mode). Kept separate from `Main`
+so both the model decoder (ports/flags) and the view can share them.
 -}
 
 import Tailo exposing (ToneMode(..))
@@ -71,3 +74,35 @@ toneModeFromString s =
 
         _ ->
             Diacritic
+
+
+type ThemeMode
+    = Light
+    | Dark
+    | SystemTheme
+
+
+themeModeToString : ThemeMode -> String
+themeModeToString mode =
+    case mode of
+        Light ->
+            "light"
+
+        Dark ->
+            "dark"
+
+        SystemTheme ->
+            "system"
+
+
+themeModeFromString : String -> ThemeMode
+themeModeFromString s =
+    case s of
+        "light" ->
+            Light
+
+        "dark" ->
+            Dark
+
+        _ ->
+            SystemTheme
